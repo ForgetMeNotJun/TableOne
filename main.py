@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import datetime as dt
-import io
 
 def load_data(uploaded_file, file_type):
     if file_type == 'csv':
@@ -34,7 +33,7 @@ def makeContinuous(dataframe, continous_col_list):
         q2 = dataframe[column].quantile(0.50).astype(float)
         q3 = dataframe[column].quantile(0.75).astype(float)
         #input value
-        df_continuous[column].loc['value'] = f'{round(q2,1)} [{round(q1,1)}-{round(q3,1)}]'
+        df_continuous[column].loc['value'] = f'{round(q2,1)} [{round(q1,1)}-{round(q,1)}]'
     return df_continuous
 
 def makeCategorical(dataframe, categorical_col_list):
@@ -56,7 +55,7 @@ def tableOne(dataframe,continous_col_list,categorical_col_list,column_order,labe
 
 @st.cache
 def convert_df(dataframe):
-     # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return dataframe.to_csv()
  
 st.title('TableOne')
