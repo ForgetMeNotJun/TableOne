@@ -1,17 +1,15 @@
 import streamlit as st
 import pandas as pd
+from scipy import stats
 
 def load_data(uploaded_file, file_type):
     if file_type == 'csv':
-        df = pd.read_csv(uploaded_file, encoding = 'utf-8')
-        
+        df = pd.read_csv(uploaded_file, encoding = 'utf-8') 
     elif file_type == 'xlsx (xls)':
         df = pd.read_excel(uploaded_file)  
-    
     else: st.error(
         'Only files in csv or xlsx (or xls) format can be uploaded!'
     )
-    
     return df
 
 #table split by exposure
@@ -54,7 +52,7 @@ def tableOne(dataframe,continous_col_list,categorical_col_list,column_order,labe
 @st.cache
 def convert_df(dataframe):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return dataframe.to_csv()
+    return dataframe.to_csv(encoding = 'utf-8')
  
 st.title('TableOne')
 
@@ -67,7 +65,7 @@ file_type = st.selectbox(
       			"Which file type would you like to upload: csv or xlsx (xls) ?",
      			('csv', 'xlsx (xls)'),)
 
-uploaded_file = st.file_uploader("", type="csv", key='file_uploader')
+uploaded_file = st.file_uploader("", type=["csv", "xlsx"], key='file_uploader')
 
 if uploaded_file is not None:
     df = load_data(uploaded_file,file_type) 
@@ -109,6 +107,26 @@ if uploaded_file is not None:
         
         table_one = pd.concat([overall_table,ex_table], axis=1)
         table_one = pd.concat([table_one,non_table], axis=1)
+    
+        p_list = []
+        for column in list(table_one.index):
+            if column in continous_col_list:
+                p = round(stats.ttest_ind(df_ex[column],df_non[column]).pvalue,2)
+            else:
+                A1 = len(df_ex[df_ex[column] == 1])
+                A2 = len(df_ex) - A1
+                B1 = len(df_non[df_non[column] == 1])
+                B2 = len(df_non) - B1
+                A = pd.DataFrame({'Yes':A1,'No':A2,},index=['Q1'])
+                B = pd.DataFrame({'Yes':B1,'No':B2,},index=['Q2'])
+                crossTable = pd.concat([A,B])
+                x2, p, dof, e = stats.chi2_contingency(crossTable,correction=False)
+            
+            if p >= 0.001:
+                p = str(round(p,3))
+            else: p = str('<0.001')
+            p_list.append(p)
+        table_one['P-value'] = p_list
         download = convert_df(table_one)
         
         if st.button('Make Table 1'):
@@ -117,5 +135,4 @@ if uploaded_file is not None:
                 label="Download data as csv",
                 data=download,
                 file_name='Table1.csv',
-                #mime='text/csv',
             )
