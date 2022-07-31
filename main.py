@@ -101,9 +101,9 @@ if uploaded_file is not None:
     
     else:
         df_ex, df_non = splitTable(df, exposure)  
-        overall_table = tableOne(df,continous_col_list,categorical_col_list, column_order,f"overall /n (n={len(df)})")
-        ex_table = tableOne(df_ex,continous_col_list,categorical_col_list, column_order, f"exposure /n (n={len(df_ex)})")
-        non_table = tableOne(df_non,continous_col_list,categorical_col_list, column_order,f"non-exposure /n (n={len(df_non)})")
+        overall_table = tableOne(df,continous_col_list,categorical_col_list, column_order,f"overall \n (n={len(df)})")
+        ex_table = tableOne(df_ex,continous_col_list,categorical_col_list, column_order, f"exposure \n (n={len(df_ex)})")
+        non_table = tableOne(df_non,continous_col_list,categorical_col_list, column_order,f"non-exposure \n (n={len(df_non)})")
         
         table_one = pd.concat([overall_table,ex_table], axis=1)
         table_one = pd.concat([table_one,non_table], axis=1)
@@ -130,7 +130,7 @@ if uploaded_file is not None:
         download = convert_df(table_one)
         
         if st.button('Make Table 1'):
-            st.dataframe(table_one)
+            st.table(table_one)
             st.download_button(
                 label="Download data as csv",
                 data=download,
