@@ -90,7 +90,7 @@ if uploaded_file is not None:
     
     # select 
     table_type = st.selectbox(
-        "Do you set Exposure? (Would you like table 1 to split in multiple columns on the basis of the exposure?)",
+        "Do you set an exposure? (Would you like table 1 to split in multiple columns on the basis of the exposure?)",
         ('Yes', 'No'),
     )
     
